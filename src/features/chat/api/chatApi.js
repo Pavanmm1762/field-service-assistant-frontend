@@ -1,7 +1,7 @@
 import axiosInstance from '../../../lib/axios'
 import { MOCK_CHAT_RESPONSES } from '../../../lib/constants'
 
-let responseIndex = 0
+// let responseIndex = 0
 
 export async function sendMessage(message) {
 
