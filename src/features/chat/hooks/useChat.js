@@ -1,15 +1,16 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { sendMessage } from '../api/chatApi'
 
+const INITIAL_MESSAGE = {
+  id: 'sys-1',
+  role: 'assistant',
+  content:
+    "Hello, I'm your Field Service AI. Upload an equipment image to begin diagnostics, or ask me anything about your field equipment.",
+  timestamp: new Date(),
+}
+
 export function useChat() {
-  const [messages, setMessages] = useState([
-    {
-      id: 'sys-1',
-      role: 'assistant',
-      content: 'Hello, I\'m your Field Service AI. Upload an equipment image to begin diagnostics, or ask me anything about your field equipment.',
-      timestamp: new Date(),
-    },
-  ])
+  const [messages, setMessages] = useState([INITIAL_MESSAGE])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef(null)
@@ -17,6 +18,17 @@ export function useChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
+
+  const clearMessages = useCallback(() => {
+    setMessages([
+      {
+        ...INITIAL_MESSAGE,
+        timestamp: new Date(),
+      },
+    ])
+    setInput('')
+    setIsTyping(false)
+  }, [])
 
   const send = useCallback(async (text) => {
     const content = text?.trim() || input.trim()
@@ -35,26 +47,38 @@ export function useChat() {
 
     try {
       const reply = await sendMessage(content)
+
       const assistantMsg = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
         content: reply,
         timestamp: new Date(),
       }
+
       setMessages((prev) => [...prev, assistantMsg])
     } catch {
       const errMsg = {
         id: `err-${Date.now()}`,
         role: 'assistant',
-        content: 'I encountered an issue processing your request. Please try again.',
+        content:
+          'I encountered an issue processing your request. Please try again.',
         timestamp: new Date(),
         isError: true,
       }
+
       setMessages((prev) => [...prev, errMsg])
     } finally {
       setIsTyping(false)
     }
   }, [input])
 
-  return { messages, input, setInput, isTyping, send, messagesEndRef }
+  return {
+    messages,
+    input,
+    setInput,
+    isTyping,
+    send,
+    clearMessages,
+    messagesEndRef,
+  }
 }

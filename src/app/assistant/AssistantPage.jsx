@@ -16,15 +16,29 @@ const QUICK_PROMPTS = [
 
 export default function AssistantPage() {
   const { selectFile, clearFile, analyze, preview, file, result, loading, error } = useImageAnalysis()
-  const { messages, input, setInput, isTyping, send, messagesEndRef } = useChat()
+  const { messages, input, setInput, isTyping, send, messagesEndRef, clearMessages, } = useChat()
   const { setAnalysisResult } = useAppContext()
 
   useEffect(() => {
-    if (result) {
-      setAnalysisResult(result)
-      send(`I've detected: ${result.equipment} with issue "${result.issue}" (severity: ${result.severity}, confidence: ${result.confidence}%). What should I do?`)
+    if (!result) return
+
+    setAnalysisResult(result)
+
+    if (
+      result.equipment !== "Unknown" &&
+      result.confidence > 0
+    ) {
+      send(
+        `What should I do to fix the detected issue on this ${result.equipment}?`
+      )
     }
-  }, [result, send, setAnalysisResult])
+  }, [result])
+
+  const handleClear = () => {
+    clearFile()
+    clearMessages()
+    setAnalysisResult(null)
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
@@ -41,7 +55,7 @@ export default function AssistantPage() {
             <ImageUpload
               onFile={selectFile}
               onAnalyze={analyze}
-              onClear={clearFile}
+              onClear={handleClear}
               preview={preview}
               file={file}
               loading={loading}
