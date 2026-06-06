@@ -1,9 +1,0 @@
-react-router-dom
-axios
-tailwindcss
-@tailwindcss/vite
-lucide-react
-react-dropzone
-
-npm install react-router-dom axios lucide-react react-dropzone
-npm install -D tailwindcss @tailwindcss/vite
