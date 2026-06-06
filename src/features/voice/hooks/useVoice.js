@@ -1,0 +1,1 @@
+import { useState } from 'react'; export function useVoice() { const [recording, setRecording] = useState(false); return { recording, startRecording: () => setRecording(true), stopRecording: () => setRecording(false) } }
