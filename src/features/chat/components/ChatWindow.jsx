@@ -7,7 +7,7 @@ export function ChatWindow({ messages, isTyping, messagesEndRef }) {
     <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
       {messages.length === 0 && (
         <div className="flex flex-col items-center justify-center h-full gap-3 text-center py-10">
-          <div className="w-12 h-12 rounded-2xl bg-surface-700 border border-surface-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl border flex items-center justify-center" style={{ background: 'var(--bg-card)' , border: '1px solid var(--border-default)' }}>
             <Bot size={22} className="text-text-muted" />
           </div>
           <p className="text-text-muted text-sm max-w-[220px]">

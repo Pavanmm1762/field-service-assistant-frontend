@@ -28,7 +28,8 @@ export default function HistoryPage() {
   const hasFilters = filters.severity || filters.status || filters.search
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-7">
+    <div className="mx-auto px-4 sm:px-6 py-8 flex flex-col gap-7"
+      style={{ background: 'var(--bg-raised)' }}>
 
       {/* ── Page header ─────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">

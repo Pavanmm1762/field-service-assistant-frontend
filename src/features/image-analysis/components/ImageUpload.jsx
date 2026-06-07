@@ -1,27 +1,21 @@
 import { useRef, useState, useCallback } from 'react'
-import { Upload, Image as ImageIcon, X, ScanLine, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Upload, Image as ImageIcon, X, ScanLine, AlertCircle } from 'lucide-react'
 import { Spinner } from '../../../components/ui/Spinner'
 
 export function ImageUpload({ onFile, onAnalyze, preview, file, loading, error, onClear }) {
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
+  const [iconHovered, setIconHovered] = useState(false)
 
-  const handleDrop = useCallback(
-    (e) => {
-      e.preventDefault()
-      setDragging(false)
-      const dropped = e.dataTransfer.files[0]
-      if (dropped) onFile(dropped)
-    },
-    [onFile]
-  )
-
-  const handleDragOver = (e) => {
+  const handleDrop = useCallback((e) => {
     e.preventDefault()
-    setDragging(true)
-  }
+    setDragging(false)
+    const dropped = e.dataTransfer.files[0]
+    if (dropped) onFile(dropped)
+  }, [onFile])
 
-  const handleDragLeave = () => setDragging(false)
+  const handleDragOver  = (e) => { e.preventDefault(); setDragging(true) }
+  const handleDragLeave = ()  => setDragging(false)
 
   const handleChange = (e) => {
     const f = e.target.files[0]
@@ -31,45 +25,53 @@ export function ImageUpload({ onFile, onAnalyze, preview, file, loading, error, 
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Drop zone */}
+
+      {/* ── Drop zone ── */}
       {!preview ? (
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={() => inputRef.current?.click()}
-          className={`
-            relative group cursor-pointer rounded-2xl border-2 border-dashed
-            transition-all duration-200 overflow-hidden
-            flex flex-col items-center justify-center gap-3
-            min-h-[200px] sm:min-h-[240px] px-6 py-10
-            ${dragging
-              ? 'border-cyan-400 bg-cyan-400/5 scale-[1.01]'
-              : 'border-surface-600 hover:border-cyan-400/50 hover:bg-surface-700/40'
-            }
-          `}
+          onMouseEnter={() => setIconHovered(true)}
+          onMouseLeave={() => setIconHovered(false)}
+          className="relative cursor-pointer rounded-2xl overflow-hidden flex flex-col items-center justify-center gap-3 min-h-[200px] sm:min-h-[240px] px-6 py-10 transition-all duration-200"
+          style={{
+            border:     `2px dashed ${dragging ? 'var(--accent-cyan)' : 'var(--border-strong)'}`,
+            background: dragging
+              ? 'rgba(0,229,255,0.04)'
+              : 'var(--bg-elevated)',
+            transform: dragging ? 'scale(1.01)' : 'scale(1)',
+          }}
         >
-          {/* Grid pattern */}
-          <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-30 pointer-events-none" />
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 grid-pattern pointer-events-none opacity-40" />
 
-          <div className={`
-            relative w-16 h-16 rounded-2xl border border-surface-600 bg-surface-800
-            flex items-center justify-center transition-all duration-200
-            group-hover:border-cyan-400/40 group-hover:bg-surface-700
-            ${dragging ? 'border-cyan-400/60 bg-surface-700 scale-110' : ''}
-          `}>
-            {dragging ? (
-              <ScanLine size={28} className="text-cyan-400 animate-pulse" />
-            ) : (
-              <Upload size={24} className="text-text-muted group-hover:text-cyan-400 transition-colors" />
-            )}
+          {/* Icon box */}
+          <div
+            className="relative w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-200"
+            style={{
+              background: dragging || iconHovered ? 'var(--bg-hover)' : 'var(--bg-card)',
+              border: `1px solid ${dragging ? 'rgba(0,229,255,0.5)' : iconHovered ? 'rgba(0,229,255,0.35)' : 'var(--border-default)'}`,
+              transform: dragging ? 'scale(1.1)' : 'scale(1)',
+            }}
+          >
+            {dragging
+              ? <ScanLine size={28} className="animate-pulse" style={{ color: 'var(--accent-cyan)' }} />
+              : <Upload   size={24} style={{ color: iconHovered ? 'var(--accent-cyan)' : 'var(--text-muted)', transition: 'color 0.15s' }} />
+            }
           </div>
 
+          {/* Labels */}
           <div className="relative text-center">
-            <p className="font-display font-semibold text-text-primary text-sm">
+            <p className="font-display font-semibold text-sm transition-colors duration-200"
+               style={{ color: 'var(--text-primary)' }}>
               {dragging ? 'Drop to analyze' : 'Drop equipment image here'}
             </p>
-            <p className="text-text-muted text-xs mt-1">or click to browse · PNG, JPG, JPEG · max 10MB</p>
+            <p className="text-xs mt-1 transition-colors duration-200"
+               style={{ color: 'var(--text-muted)' }}>
+              or click to browse · PNG, JPG, JPEG · max 10MB
+            </p>
           </div>
 
           <input
@@ -80,75 +82,118 @@ export function ImageUpload({ onFile, onAnalyze, preview, file, loading, error, 
             className="hidden"
           />
         </div>
+
       ) : (
-        /* Preview */
-        <div className="relative rounded-2xl overflow-hidden border border-surface-600 bg-surface-800 group">
+        /* ── Image preview ── */
+        <div
+          className="relative rounded-2xl overflow-hidden group"
+          style={{ border: '1px solid var(--border-default)' }}
+        >
           <img
             src={preview}
             alt="Equipment preview"
             className="w-full object-cover max-h-[280px]"
           />
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-surface-950/80 to-transparent" />
 
-          {/* File info */}
+          {/* Dark gradient overlay — always visible so text stays readable over any image */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }}
+          />
+
+          {/* File info bar */}
           <div className="absolute bottom-0 left-0 right-0 p-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-surface-800/80 border border-surface-600 flex items-center justify-center">
-                <ImageIcon size={14} className="text-cyan-400" />
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center"
+                style={{ background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.15)' }}
+              >
+                <ImageIcon size={14} style={{ color: 'var(--accent-cyan)' }} />
               </div>
               <div>
-                <p className="text-xs font-mono text-text-primary leading-none truncate max-w-[180px]">{file.name}</p>
-                <p className="text-[10px] text-text-muted mt-0.5">{(file.size / 1024).toFixed(0)} KB</p>
+                <p className="text-xs font-mono leading-none truncate max-w-[180px]"
+                   style={{ color: 'rgba(255,255,255,0.9)' }}>
+                  {file.name}
+                </p>
+                <p className="text-[10px] mt-0.5"
+                   style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  {(file.size / 1024).toFixed(0)} KB
+                </p>
               </div>
             </div>
+
             {!loading && (
               <button
                 onClick={(e) => { e.stopPropagation(); onClear() }}
-                className="w-7 h-7 rounded-lg bg-surface-800/80 border border-surface-600 text-text-muted hover:text-red-400 hover:border-red-400/30 flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-150"
+                style={{ background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.6)' }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--accent-red)'; e.currentTarget.style.borderColor = 'rgba(255,82,82,0.4)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)' }}
               >
                 <X size={13} />
               </button>
             )}
           </div>
 
-          {/* Scan animation while loading */}
+          {/* Scan line animation during analysis */}
           {loading && (
-            <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div
-                className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-80"
-                style={{ animation: 'scan 1.5s linear infinite' }}
+                className="absolute left-0 right-0 h-0.5 opacity-80"
+                style={{
+                  background: 'linear-gradient(90deg, transparent, var(--accent-cyan), transparent)',
+                  animation: 'scan 1.5s linear infinite',
+                }}
               />
             </div>
           )}
         </div>
       )}
 
-      {/* Error */}
+      {/* ── Validation error ── */}
       {error && (
-        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 animate-fade-up">
-          <AlertCircle size={14} className="text-red-400 shrink-0" />
-          <p className="text-red-400 text-xs font-mono">{error}</p>
+        <div
+          className="flex items-center gap-2 px-3 py-2.5 rounded-xl animate-fade-up"
+          style={{ background: 'rgba(255,82,82,0.08)', border: '1px solid rgba(255,82,82,0.25)' }}
+        >
+          <AlertCircle size={14} className="shrink-0" style={{ color: 'var(--accent-red)' }} />
+          <p className="text-xs font-mono" style={{ color: 'var(--accent-red)' }}>{error}</p>
         </div>
       )}
 
-      {/* Analyze button */}
+      {/* ── Analyze CTA ── */}
       {preview && !loading && (
         <button
           onClick={onAnalyze}
-          className="btn-primary w-full flex items-center justify-center gap-2"
+          className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-display font-semibold text-sm transition-all duration-150 active:scale-95"
+          style={{
+            background: 'var(--accent-cyan)',
+            color:      'var(--bg-base)',
+          }}
+          onMouseEnter={e => e.currentTarget.style.filter = 'brightness(1.1)'}
+          onMouseLeave={e => e.currentTarget.style.filter = 'brightness(1)'}
         >
           <ScanLine size={16} />
           Run Diagnostic Analysis
         </button>
       )}
 
+      {/* ── Loading state ── */}
       {loading && (
-        <div className="flex items-center justify-center gap-3 py-3 rounded-xl bg-cyan-400/5 border border-cyan-400/20">
+        <div
+          className="flex items-center justify-center gap-3 py-3 rounded-xl"
+          style={{
+            background: 'rgba(0,229,255,0.05)',
+            border:     '1px solid rgba(0,229,255,0.18)',
+          }}
+        >
           <Spinner size="sm" />
-          <span className="text-sm font-mono text-cyan-400">Analyzing equipment...</span>
+          <span className="text-sm font-mono" style={{ color: 'var(--accent-cyan)' }}>
+            Analyzing equipment…
+          </span>
         </div>
       )}
+
     </div>
   )
 }

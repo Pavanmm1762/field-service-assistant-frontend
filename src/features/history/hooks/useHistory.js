@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { fetchHistory, fetchSession, getStats } from '../api/historyApi'
+import { fetchHistory, fetchSession } from '../api/historyApi'
 
 const PAGE_SIZE = 9
 
@@ -13,9 +13,6 @@ export function useHistory() {
   const [stats, setStats]         = useState({ total: 0, critical: 0, open: 0, resolved: 0 })
   const [filters, setFilters]     = useState({ severity: '', status: '', search: '' })
 
-  // Load stats once
-  useEffect(() => { setStats(getStats()) }, [])
-
   const load = useCallback(async (p, f) => {
     setLoading(true)
     setError(null)
@@ -24,6 +21,21 @@ export function useHistory() {
       setRecords(res.data)
       setTotal(res.total)
       setTotalPages(res.totalPages)
+      setStats({
+        total: res.total,
+
+        critical: res.data.filter(
+          s => s.severity === 'Critical'
+        ).length,
+
+        open: res.data.filter(
+          s => s.status === 'Open'
+        ).length,
+
+        resolved: res.data.filter(
+          s => s.status === 'Resolved'
+        ).length
+      })
     } catch (err) {
       setError(err.message)
     } finally {

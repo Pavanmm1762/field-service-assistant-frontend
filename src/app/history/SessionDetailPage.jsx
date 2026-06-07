@@ -12,7 +12,7 @@ export default function SessionDetailPage({ id, onBack }) {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 flex flex-col items-center gap-4">
+      <div className="mx-auto px-4 sm:px-6 py-20 flex flex-col items-center gap-4" style={{ background: 'var(--bg-raised)' }}>
         <Spinner size="lg" />
         <p className="text-sm font-mono" style={{ color: 'var(--text-muted)' }}>Loading session…</p>
       </div>
@@ -21,7 +21,7 @@ export default function SessionDetailPage({ id, onBack }) {
 
   if (error || !session) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 flex flex-col items-center gap-4">
+      <div className="mx-auto px-4 sm:px-6 py-20 flex flex-col items-center gap-4" style={{ background: 'var(--bg-raised)' }}>
         <div
           className="w-12 h-12 rounded-2xl flex items-center justify-center"
           style={{ background: 'rgba(255,82,82,0.1)', border: '1px solid rgba(255,82,82,0.3)' }}
@@ -42,8 +42,8 @@ export default function SessionDetailPage({ id, onBack }) {
 
   return (
     <div
-      className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-6"
-      style={{ animation: 'fadeUp 0.35s ease-out both' }}
+      className="mx-auto px-4 sm:px-6 py-8 flex flex-col gap-6"
+      style={{ animation: 'fadeUp 0.35s ease-out both', background: 'var(--bg-raised)' }}
     >
       {/* Session header card */}
       <SessionHeader session={session} onBack={onBack} />
