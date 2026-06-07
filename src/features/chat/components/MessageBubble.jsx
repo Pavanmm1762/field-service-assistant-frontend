@@ -27,7 +27,7 @@ export function MessageBubble({ message }) {
       {/* Bubble */}
       <div className={`flex flex-col gap-1 max-w-[78%] ${isUser ? 'items-end' : 'items-start'}`}>
         <div className={`
-          px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed
+          px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap
           ${isUser
             ? 'bg-blue-500/15 border border-blue-500/20 text-text-primary rounded-tr-sm'
             : message.isError

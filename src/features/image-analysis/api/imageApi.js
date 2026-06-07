@@ -13,3 +13,8 @@ export async function uploadImage(file) {
   return response.data
 
 }
+
+export async function resetSession() {
+  const response = await axiosInstance.post('/session/reset')
+  console.log("Session reset response:", response.data)
+}

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { uploadImage } from '../api/imageApi'
+import { uploadImage, resetSession } from '../api/imageApi'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE_MB } from '../../../lib/constants'
 
 export function useImageAnalysis() {
@@ -17,7 +17,7 @@ export function useImageAnalysis() {
       return `File size must be under ${MAX_FILE_SIZE_MB}MB.`
     }
     return null
-  }
+  } 
 
   const selectFile = useCallback((f) => {
     setError(null)
@@ -32,7 +32,17 @@ export function useImageAnalysis() {
     return true
   }, [])
 
-  const clearFile = useCallback(() => {
+  const clearFile = useCallback(async () => {
+    try {
+      await resetSession()
+    } catch (error) {
+      console.error(
+        'Failed to reset session',
+        error
+      )
+      setError(error.message || 'Failed to reset session. Please try again.')
+    }
+
     if (preview) URL.revokeObjectURL(preview)
     setFile(null)
     setPreview(null)

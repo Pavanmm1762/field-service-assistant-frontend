@@ -24,13 +24,20 @@ export default function AssistantPage() {
 
     setAnalysisResult(result)
 
-    if (
+   if (
       result.equipment !== "Unknown" &&
       result.confidence > 0
     ) {
-      send(
-        `What should I do to fix the detected issue on this ${result.equipment}?`
-      )
+
+      if (result.fault_detected) {
+
+        send(
+          `What should I do to fix the detected issue on this ${result.equipment}?`
+        )
+
+      } else {
+ 
+      }
     }
   }, [result])
 
