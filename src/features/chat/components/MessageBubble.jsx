@@ -74,7 +74,28 @@ export function MessageBubble({ message }) {
           className="px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap transition-colors duration-300"
           style={styles.bubble}
         >
-          {message.content}
+          {message.content.message || message.content}
+          {message.content.sources && message.content.sources.length > 0 && (
+            <div className="mt-2 text-xs text-text-muted">
+              <strong>Sources:</strong>
+              <ul className="list-disc list-inside">
+                {message.content.sources.map((source, index) => (
+                  <li key={index}>
+                    <span className="font-medium">
+                      {source.filename}
+                    </span>
+
+                    {source.equipment && (
+                      <span className="ml-1 text-text-muted">
+                        ({source.equipment})
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
         </div>
         <span
           className="text-[10px] font-mono px-1 transition-colors duration-300"

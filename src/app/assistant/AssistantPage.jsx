@@ -82,9 +82,24 @@ export default function AssistantPage() {
   const { setAnalysisResult } = useAppContext()
 
   useEffect(() => {
-    if (result) {
-      setAnalysisResult(result)
-      send(`I've detected: ${result.equipment} with issue "${result.issue}" (severity: ${result.severity}, confidence: ${result.confidence}%). What should I do?`)
+    if (!result) return
+
+    setAnalysisResult(result)
+
+   if (
+      result.equipment !== "Unknown" &&
+      result.confidence > 0
+    ) {
+
+      if (result.fault_detected) {
+
+        send(
+          `What should I do to fix the detected issue on this ${result.equipment}?`
+        )
+
+      } else {
+ 
+      }
     }
   }, [result])
 
