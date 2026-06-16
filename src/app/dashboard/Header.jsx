@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { label: 'Diagnostics', to: '/' },
   { label: 'History',     to: '/history' },
   { label: 'Reports',     to: '/reports' },
-  { label: 'Fleet',       to: '#' },
+  { label: 'Documents',   to: '/documents' },
 ]
 
 export function Header() {
